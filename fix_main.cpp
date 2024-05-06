@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#define rented 50
+#include <string>
 
 using namespace std;
 
