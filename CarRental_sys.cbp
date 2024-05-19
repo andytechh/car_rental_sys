@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="CarRental_sys" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="default">
+				<Option output="CarRental_sys" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
+		</Build>
+		<Unit filename="database.txt" />
+		<Unit filename="logindatabase.txt" />
+		<Unit filename="main.cpp" />
+		<Unit filename="tempdatabase.txt" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
