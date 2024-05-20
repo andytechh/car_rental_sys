@@ -400,7 +400,7 @@ void Car_Management::customer() {
     cout << "*                               *\n";
     cout << "*-------------------------------*\n";
     cout << "*                               *\n";
-     cout << "*  Car ID " << newCarID <<endl;
+     cout <<"*   Car ID " << newCarID <<endl;
     cout << "*   Car Model: ";
     cin.ignore();
     getline(cin, carModel);
