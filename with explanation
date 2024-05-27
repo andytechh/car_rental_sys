@@ -911,7 +911,12 @@ void Car_Management::returnCar(const string& username) {
 
 int main()
 {
+    // Create an instance of the Car_Management class
     Car_Management car;
+
+    // Call the frontPage() function to display the welcome page
     car.frontPage();
+
+    // Return 0 to indicate successful execution of the program
     return 0;
 }
