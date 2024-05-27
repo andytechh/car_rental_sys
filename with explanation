@@ -1,0 +1,917 @@
+#include <iostream>    // For input-output operations
+#include <fstream>     // For file handling
+#include <string>      // For string operations
+#include <conio.h>     // For _getch() function to handle password input without echoing characters
+#include <cstdlib>     // For system() function to clear screen and pause the program
+#include <iomanip>     // For formatted output, e.g., setting precision for floating-point numbers
+#include <windows.h>   // For system("cls") and other Windows-specific operations
+
+using namespace std;
+
+class Car_Management{
+private:
+    int carID;
+    string model, custName, rented;
+    float rentalRate;
+    bool available;
+    string color;
+    int yearmodel, rentdays;
+    string loggedInUser;
+public:
+    void frontPage(); // Function to display the front page of the application.
+    void menu(); // Function to display the main menu and navigate between admin and customer options.
+    void login(); // Function to handle admin login.
+    void admin(); // Function to display the admin menu and perform admin-related tasks.
+    void customer(); // Function to display the customer menu and perform customer-related tasks.
+    void addCar(); // Function to add a new car to the database.
+    void modifyCar(); // Function to modify details of an existing car in the database.
+    void removeCar(); // Function to remove a car from the database.
+    void viewCar(); // Function to view all cars in the database.
+    void rentCar(const string& username); // Function to rent a car for a customer.
+    void returnCar(const string& username); // Function to return a rented car.
+    void userlogin(); // Function to handle customer login.
+    void registration(); // Function to register a new customer.
+    void customerMenu(); // Function to display the customer menu.
+    void viewRented(const string& username); // Function to view cars rented by a specific customer.
+    void viewAvailable(); // Function to view all available cars.
+};
+
+void Car_Management::frontPage(){
+
+ 		cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "*       Car Rental System       *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "*            Group 1            *\n";
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "*            Members            *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "*   Lazarte, Andy               *\n";
+        cout << "*   Marcelo, Jerick             *\n";
+        cout << "*   Fernandez, Louis Chanler    *\n";
+        cout << "*   Lomerio, Aira Mae           *\n";
+        cout << "*   Narito, Aries Daniel        *\n";
+        cout << "*                               *\n";
+        cout << "*_______________________________*\n";
+        Sleep(3000);
+        menu();
+
+}
+void Car_Management::menu() {
+    int choice;
+
+    do {
+        system("cls"); // Clear the console screen
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "*             Menu              *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "* [ 1 ]   Admin                 *\n";
+        cout << "* [ 2 ]   Customer              *\n";
+        cout << "* [ 3 ]   Exit                  *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "* Select Options (1-3):         *\n";
+        cin >> choice; // Read user's choice
+        cout << "*_______________________________*\n";
+
+        // Handle user choice using a switch statement
+        switch (choice) {
+            case 1:
+                system("cls"); // Clear the console screen
+                login(); // Call the login function for admin
+                break;
+            case 2:
+                customerMenu(); // Call the customer menu function
+                break;
+            case 3:
+                exit(0); // Exit the program
+            default:
+                cout << "Invalid Input.."; // Handle invalid input
+                break;
+        }
+    } while (true); // Repeat the loop until the program exits
+}
+
+void Car_Management::registration() {
+    ofstream logindata; // Output file stream for login data
+    string user;
+
+start:
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "*         Registration          *\n";
+    cout << "*                               *\n";
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "Create Username: ";
+    cin >> user; // Read the username
+
+    string pass;
+    cout << "\nCreate Password: ";
+    char ch = _getch(); // Read a character without displaying it
+    while (ch != 13) { // 13 is ASCII code for Enter key
+        if (ch == '\b') { // Check for backspace
+            if (!pass.empty()) {
+                pass.erase(pass.size() - 1); // Remove last character
+                cout << "\b \b"; // Move cursor back and erase character
+            }
+        } else {
+            pass.push_back(ch); // Append character to password
+            cout << '*'; // Display asterisk for password character
+        }
+        ch = _getch(); // Read next character
+    }
+
+    logindata.open("logindatabase.txt", ios::app); // Open file in append mode
+    if (!logindata) {
+        cerr << "Error opening file."; // Error handling
+        return;
+    }
+
+    logindata << user << " " << pass << "\n"; // Write username and password to file
+    logindata.close(); // Close the file
+
+    cout << "\nRegistration successful.\n"; // Confirm registration
+}
+
+void Car_Management::userlogin() {
+    ifstream logindata; // Input file stream for login data
+    string user;
+    system("cls"); // Clear the console screen
+
+start:
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "*        Customer Login         *\n";
+    cout << "*                               *\n";
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "Enter Username: ";
+    cin >> user; // Read the username
+
+    string pass;
+    cout << "\nEnter Password: ";
+    char ch = _getch(); // Read a character without displaying it
+    while (ch != 13) { // 13 is ASCII code for Enter key
+        if (ch == '\b') { // Check for backspace
+            if (!pass.empty()) {
+                pass.erase(pass.size() - 1); // Remove last character
+                cout << "\b \b"; // Move cursor back and erase character
+            }
+        } else {
+            pass.push_back(ch); // Append character to password
+            cout << '*'; // Display asterisk for password character
+        }
+        ch = _getch(); // Read next character
+    }
+
+    logindata.open("logindatabase.txt", ios::in); // Open file in read mode
+    if (!logindata) {
+        cerr << "Error opening file."; // Error handling
+        return;
+    }
+
+    bool loggedIn = false; // Flag to check if login is successful
+    string storedUser, storedPass;
+    while (logindata >> storedUser >> storedPass) { // Read stored username and password
+        if (user == storedUser && pass == storedPass) { // Check if credentials match
+            loggedIn = true;
+            loggedInUser = user; // Store the logged-in user
+            break;
+        }
+    }
+
+    logindata.close(); // Close the file
+
+    if (loggedIn) {
+        cout << "\nLogin successful.\n"; // Confirm login
+        customer(); // Direct to the customer menu
+    } else {
+        cout << "\n\n Wrong Password or Username, Try Again \n"; // Handle incorrect login
+        system("pause"); // Pause the system
+        system("cls"); // Clear the console screen
+        goto start; // Restart the login process
+    }
+}
+
+
+void Car_Management::login() {
+    string user;
+
+start:
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "*             Login             *\n";
+    cout << "*                               *\n";
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "Enter Username: ";
+    cin >> user; // Read the username
+
+    string pass;
+    cout << "\nEnter Password: ";
+    char ch = _getch(); // Read a character without displaying it
+    while (ch != 13) { // 13 is ASCII code for Enter key
+        if (ch == '\b') { // Check for backspace
+            if (!pass.empty()) {
+                pass.erase(pass.size() - 1); // Remove last character
+                cout << "\b \b"; // Move cursor back and erase character
+            }
+        } else {
+            pass.push_back(ch); // Append character to password
+            cout << '*'; // Display asterisk for password character
+        }
+        ch = _getch(); // Read next character
+    }
+
+    // Check if the username and password are correct for admin
+    if (user == "Admin" && pass == "Admin12345") {
+        admin(); // Direct to the admin menu
+    } else {
+        cout << "\n\n Wrong Password or Username, Try Again \n"; // Handle incorrect login
+        system("pause"); // Pause the system
+        system("cls"); // Clear the console screen
+        goto start; // Restart the login process
+    }
+}
+
+void Car_Management::admin() {
+    int choice;
+
+    do {
+        system("cls");
+     
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "*         Administrator         *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "* [ 1 ]   Add Car               *\n";
+        cout << "* [ 2 ]   Modify a Car          *\n";
+        cout << "* [ 3 ]   Remove a Car          *\n";
+        cout << "* [ 4 ]   View Cars             *\n";
+        cout << "* [ 5 ]   View Rented Cars      *\n";
+        cout << "* [ 6 ]   Exit                  *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "* Select Options (1-5):         *\n";
+        cin >> choice;
+        cout << "*_______________________________*\n";
+
+        switch (choice) {
+            case 1:
+                addCar();
+                break;
+            case 2:
+                modifyCar();
+                break;
+            case 3:
+                removeCar();
+                break;
+            case 4:
+                viewCar();
+                break;
+            case 5:
+                viewRented(loggedInUser); 
+                break;
+            case 6: 
+             	menu();
+             	break;
+            default:
+                cout << "Invalid Input..\n";
+
+                cout << "Press any key to continue...\n";
+                cin.ignore();
+                cin.get(); 
+        }
+    } while (true); 
+}
+
+void Car_Management::addCar() {
+    // Open the file in append mode to add new car details at the end
+    ofstream carsData("database.txt", ios::app);
+
+    // Check if the file opened successfully
+    if (!carsData.is_open()) {
+        cerr << "Error opening file." << endl;
+        return;
+    }
+
+    // Variables to store car details
+    int newCarID, yearModel;
+    string carModel, color;
+    float rentalRate;
+    char status;
+    int numCars = 0; // Variable to count the number of cars
+
+    // Read the file to count the existing number of cars
+    string line;
+    ifstream carDataRead("database.txt");
+    while (getline(carDataRead, line)) {
+        numCars++;
+    }
+    carDataRead.close();
+
+    // Calculate the new car ID
+    newCarID = numCars + 1;
+
+    // Clear the console screen
+    system("cls");
+
+    // Display the car addition menu
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "*           Add Car             *\n";
+    cout << "*                               *\n";
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "*   Car ID " << newCarID << endl;
+    cout << "*   Car Model: ";
+    cin.ignore(); // Ignore any leftover newline characters in the input buffer
+    getline(cin, carModel); // Get the car model from the user
+    cout << "*   Year Model: ";
+    cin >> yearModel; // Get the year model from the user
+    cout << "*   Color: ";
+    cin >> color; // Get the color from the user
+    cout << "*   Rental Rate: ";
+    cin >> rentalRate; // Get the rental rate from the user
+    cout << "*   Status (A/a for available, anything else for unavailable): ";
+    cin >> status; // Get the status from the user
+
+    // Determine if the car is available based on the status input
+    bool available = (status == 'A' || status == 'a');
+
+    // Write the new car data to the file
+    carsData << newCarID << " " << carModel << " " << yearModel << " " << color << " " << rentalRate << " " << available << endl;
+    
+    // Inform the user that the record has been added
+    cout << "\nRecord has been added... \n";
+    
+    // Close the file
+    carsData.close();
+    
+    // Pause the system to allow the user to read the message
+    system("pause");
+}
+
+void Car_Management::customerMenu(){
+	int choice;
+    bool exitCustomer = false;
+
+    while (!exitCustomer) {
+    		system("cls");
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "*           Customer            *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "* [ 1 ]   Login                 *\n";
+        cout << "* [ 2 ]   Register              *\n";
+        cout << "* [ 3 ]   Exit                  *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "* Select Options (1-3):         *\n";
+        cin >> choice;
+        cout << "*_______________________________*\n";
+ 		switch(choice){
+ 			case 1: {
+ 				userlogin();
+				break;
+			 }
+			case 2: {
+				registration();
+				break;
+			}
+			case 3: {
+				menu();
+				break;
+			}
+			default: {
+				cout << "Invalid input\n";
+				break;
+			}
+		 }       
+}
+}
+void Car_Management::customer() {
+	
+    int choice;
+    bool exitCustomer = false;
+
+    while (!exitCustomer) {
+    		system("cls");
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "*           Customer            *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "*                               *\n";
+        cout << "* [ 1 ]   Rent Car              *\n";
+        cout << "* [ 2 ]   Return Car            *\n";
+        cout << "* [ 3 ]   Exit                  *\n";
+        cout << "*                               *\n";
+        cout << "*-------------------------------*\n";
+        cout << "* Select Options (1-3):         *\n";
+        cin >> choice;
+        cout << "*_______________________________*\n";
+
+        switch (choice) {
+            case 1:
+            	system("cls");
+                rentCar(loggedInUser);
+                break;
+            case 2:
+                returnCar(loggedInUser);
+                break;
+            case 3:
+                menu();
+                break;
+            default:
+                cout << "Invalid Input..";
+                break;
+        }
+    }
+}
+
+void Car_Management::modifyCar() {
+    fstream carsData, carsData1; // Files for reading and writing car data
+    int cId, id, ym; // Variables to store car IDs and year model
+    string m, c; // Variables to store car model and color
+    float r; // Variable to store rental rate
+    char s; // Variable to store status
+    int choice; // Variable to store user's choice for modification
+	
+    // Clear the console screen
+    system("cls");
+
+    // Display the modify car menu
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "*          Modify Car           *\n";
+    cout << "*                               *\n";
+    cout << "*-------------------------------*\n";
+    cout << "*                               *\n";
+
+    // Show the list of cars
+    viewCar();
+
+    // Prompt user to enter the ID of the car to be modified
+    cout << "Enter id of car: ";
+    cin >> cId;
+
+    // Open the original database file for reading
+    carsData.open("database.txt", ios::in);
+    // Open a temporary file for writing modified data
+    carsData1.open("tempdatabase.txt", ios::out);
+
+    // Check if the original database file opened successfully
+    if (!carsData) {
+        cout << "File does not exist." << endl;
+    }
+
+    bool carFound = false; // Flag to check if the car was found
+
+    // Read the car data from the original file
+    while (carsData >> id >> m >> ym >> c >> r >> s) {
+        // Check if the current car matches the ID entered by the user
+        if (cId == id) {
+            carFound = true; // Set flag to true if car is found
+
+            // Display the modify car options
+            cout << "*-------------------------------*\n";
+            cout << "*                               *\n";
+            cout << "*          Modify Car           *\n";
+            cout << "*                               *\n";
+            cout << "*-------------------------------*\n";
+            cout << "*                               *\n";
+            cout << "* [ 1 ]   New Car Model         *\n";
+            cout << "* [ 2 ]   New Year Model        *\n";
+            cout << "* [ 3 ]   New Color             *\n";
+            cout << "* [ 4 ]   New Rental Rate       *\n";
+            cout << "* [ 5 ]   New Status            *\n";
+            cout << "* [ 6 ]   Exit                  *\n";
+            cout << "*                               *\n";
+            cout << "*-------------------------------*\n";
+            cout << "* Select Options (1-6):         *\n";
+            cin >> choice;
+            cout << "*_______________________________*\n";
+
+            // Modify the selected car attribute based on user's choice
+            switch (choice) {
+                case 1:
+                    cout << "New car model: ";
+                    cin >> m; // Modify car model
+                    break;
+                case 2:
+                    cout << "New year model: ";
+                    cin >> ym; // Modify year model
+                    break;
+                case 3:
+                    cout << "New color: ";
+                    cin >> c; // Modify color
+                    break;
+                case 4:
+                    cout << "New Rental Rate: ";
+                    cin >> r; // Modify rental rate
+                    break;
+                case 5:
+                    cout << "New status (A/a for available, U/u for not available): ";
+                    cin >> s; // Modify status
+                    break;
+                case 6:
+                    exit(0); // Exit the program
+                    break;
+                default:
+                    cout << "Invalid Input.."; // Handle invalid input
+                    break;
+            }
+        }
+
+        // Write the modified or unmodified car record to the temporary file
+        carsData1 << id << " " << m << " " << ym << " " << c << " " << r << " " << s << endl;
+    }
+
+    // Close both files
+    carsData.close();
+    carsData1.close();
+
+    // Check if the car was not found
+    if (!carFound) {
+        cout << "Car not found." << endl;
+        remove("tempdatabase.txt"); // Delete the temporary file
+    } else {
+        // Replace the original database file with the temporary file
+        remove("database.txt");
+        rename("tempdatabase.txt", "database.txt");
+    }
+}
+
+
+void Car_Management::removeCar() {
+    int cId; // Variable para i-store ang car ID na tatanggalin
+
+    // I-prompt ang user na ilagay ang car ID
+    cout << "Remove car" << endl;
+    cout << "Enter car id: ";
+    cin >> cId;
+
+    // Buksan ang original na database file para basahin
+    ifstream carsData("database.txt");
+    // Buksan ang temporary file para magsulat
+    ofstream tempData("tempdatabase.txt");
+
+    // Suriin kung matagumpay na nabuksan ang original na database file
+    if (!carsData.is_open()) {
+        cout << "Error: Unable to open database file." << endl;
+        return;
+    }
+
+    bool carFound = false; // Flag para suriin kung natagpuan ang kotse
+
+    // Mga variable para i-store ang car details
+    int carID, yearmodel;
+    string model, color;
+    float rentalRate;
+    bool available;
+
+    // Basahin ang car data mula sa original na file
+    while (carsData >> carID >> model >> yearmodel >> color >> rentalRate >> available) {
+        if(carID == cId) {
+            carFound = true; // I-set ang flag sa true kung natagpuan ang kotse
+            cout << "Car deleted successfully." << endl;
+        } else {
+            // Isulat ang car data sa temporary file kung hindi ito tumutugma sa kotse na tatanggalin
+            tempData << carID << " " << model << " " << yearmodel << " " << color << " " << rentalRate << " " << available << endl;
+        }
+    }
+
+    // Isara ang parehong file
+    carsData.close();
+    tempData.close();
+
+    // Suriin kung hindi natagpuan ang kotse
+    if (!carFound) {
+        cout << "Error: Car with ID " << cId << " not found." << endl;
+        return;
+    }
+
+    // Palitan ang original na database file ng temporary file
+    remove("database.txt");
+    rename("tempdatabase.txt", "database.txt");
+}
+
+void Car_Management::viewCar() {
+    // Buksan ang database file para basahin
+    ifstream carsData("database.txt");
+
+    // I-display ang header para sa listahan ng mga kotse
+    cout << "car id\t\t model\t\t year model\t\t color\t\t rental rate\t\t available\n";
+
+    // Suriin kung matagumpay na nabuksan ang file
+    if (!carsData) {
+        cout << "File does not exist." << endl;
+        system("pause");
+        return;
+    }
+
+    // Mga variable para i-store ang car details
+    int carID, yearModel;
+    string model, color;
+    float rentalRate;
+    bool available;
+
+    // Basahin at i-display ang car data mula sa file
+    while (carsData >> carID >> model >> yearModel >> color >> rentalRate >> available) {
+        cout << carID << "\t\t" << model << "\t\t" << yearModel << "\t\t" << color << "\t\t" << rentalRate << "\t\t" << available << endl;
+    }
+
+    // I-pause ang system at isara ang file
+    system("pause");
+    carsData.close();
+}
+
+void Car_Management::viewRented(const string& username) {
+    // Buksan ang database file para basahin
+    ifstream carsData("database.txt");
+
+    // Suriin kung matagumpay na nabuksan ang file
+    if (!carsData) {
+        cerr << "Error: Could not open database file." << endl;
+        return;
+    }
+
+    system("cls"); // I-clear ang console screen
+    bool anyRentedCars = false; // Flag para suriin kung may rented na kotse
+
+    // I-display ang header para sa listahan ng rented na kotse
+    cout << "\n*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "*         Rented Cars            *\n";
+    cout << "*                               *\n";
+    cout << "*-------------------------------*\n";
+
+    // Mga variable para i-store ang car details
+    int carID, yearmodel;
+    string model, color;
+    float rentalRate;
+    bool available;
+
+    // Basahin at i-display ang rented na car data mula sa file
+    while (carsData >> carID >> model >> yearmodel >> color >> rentalRate >> available) {
+        if (!available) {
+            anyRentedCars = true; // I-set ang flag sa true kung may natagpuang rented na kotse
+            
+            cout << "Customer : " << username << endl;
+            cout << "Car ID: " << carID << endl;
+            cout << "Car Model: " << model << endl;
+            cout << "Year Model: " << yearmodel << endl;
+            cout << "Color: " << color << endl;
+            cout << "Rental Rate: Php " << rentalRate << " per day\n";
+            cout << "-----------------------------\n";
+        }
+    }
+
+    // Kung walang natagpuang rented na kotse, mag-display ng mensahe
+    if (!anyRentedCars) {
+        cout << "No cars are currently rented." << endl;
+    }
+
+    // I-pause ang system at isara ang file
+    system("pause");
+    carsData.close();
+}
+
+void Car_Management::viewAvailable() {
+    // Buksan ang database file para basahin
+    ifstream carsData("database.txt");
+
+    // Suriin kung matagumpay na nabuksan ang file
+    if (!carsData) {
+        cerr << "Error: Could not open database file." << endl;
+        return;
+    }
+
+    bool availableCar = false; // Flag para suriin kung may available na kotse
+    system("cls"); // I-clear ang console screen
+
+    // I-display ang header para sa listahan ng available na kotse
+    cout << "\n*-------------------------------*\n";
+    cout << "*                               *\n";
+    cout << "*        Available Cars         *\n";
+    cout << "*                               *\n";
+    cout << "*-------------------------------*\n";
+
+    // Mga variable para i-store ang car details
+    int carID, yearmodel;
+    string model, color;
+    float rentalRate;
+    bool available;
+
+    // Basahin at i-display ang available na car data mula sa file
+    while (carsData >> carID >> model >> yearmodel >> color >> rentalRate >> available) {
+        if (available) {
+            availableCar = true; // I-set ang flag sa true kung may natagpuang available na kotse
+
+            cout << "Car ID: " << carID << endl;
+            cout << "Car Model: " << model << endl;
+            cout << "Year Model: " << yearmodel << endl;
+            cout << "Color: " << color << endl;
+            cout << "Rental Rate: Php " << rentalRate << " per day\n";
+            cout << "-----------------------------\n";
+        }
+    }
+
+    // Kung walang natagpuang available na kotse, mag-display ng mensahe
+    if (!availableCar) {
+        cout << "No cars are currently available." << endl;
+    }
+
+    // I-pause ang system at isara ang file
+    system("pause");
+    carsData.close();
+}
+
+void Car_Management::rentCar(const string& username) {
+    int cId, rentDays; // Mga variable para sa car ID at bilang ng araw ng renta
+
+    // Buksan ang database file para basahin
+    ifstream carsData("database.txt");
+    // Buksan ang temporary file para magsulat
+    ofstream tempData("tempdatabase.txt");
+
+    // Suriin kung matagumpay na nabuksan ang database file
+    if (!carsData) {
+        cout << "File does not exist." << endl;
+        system("pause");
+        return;
+    }
+
+    // Ipakita ang listahan ng mga kotse
+    viewCar();
+
+    // I-prompt ang user na ilagay ang car ID na gustong rentahan
+    cout << "Enter car id you want to rent: ";
+    cin >> cId;
+
+    bool carFound = false; // Flag para suriin kung natagpuan ang kotse
+
+    // Basahin ang car data mula sa database file
+    while (carsData >> carID >> model >> yearmodel >> color >> rentalRate >> available) {
+        if (carID == cId && available) { // Suriin kung tugma ang car ID at available ang kotse
+            carFound = true; // I-set ang flag sa true kung natagpuan ang kotse
+            available = false; // I-update ang availability ng kotse
+
+            // I-prompt ang user na ilagay ang bilang ng araw ng renta
+            cout << "Enter the number of days you want to rent the car: ";
+            cin >> rentDays;
+
+            // I-clear ang screen
+            system("cls");
+            cout << "Car rented successfully." << endl;
+            
+            // Kalkulahin ang kabuuang halaga ng renta
+            float total = rentalRate * rentDays;
+            
+            // Ipakita ang resibo ng renta
+            cout << "*-------------------------------*\n";
+            cout << "*                               *\n";
+            cout << "*           Receipt             *\n";
+            cout << "*                               *\n";
+            cout << "*-------------------------------*\n";
+            cout << "*                               *\n";
+            cout << "Customer : " << loggedInUser << endl;
+            cout << "Car ID: " << carID << endl;
+            cout << "Car Model: " << model << endl;
+            cout << "Year Model: " << yearmodel << endl;
+            cout << "Color: " << color << endl;
+            cout << "Rental Rate: Php" << rentalRate << " per day\n";
+            cout << "Number of days rented: " << rentDays << endl;
+            cout << "-------------------------------\n";
+            cout << "Total Rental Fee: Php" << total << endl;
+
+            // Isulat ang updated na car data sa temporary file
+            tempData << carID << " " << model << " " << yearmodel << " " << color << " " << rentalRate << " " << available << endl;
+        } else {
+            // Isulat ang car data sa temporary file kung hindi ito ang kotse na nirentahan
+            tempData << carID << " " << model << " " << yearmodel << " " << color << " " << rentalRate << " " << available << endl;
+        }
+    }
+
+    // Kung hindi natagpuan ang kotse o ito ay nirentahan na, mag-display ng mensahe
+    if (!carFound) {
+        cout << "Car not found or already rented." << endl;
+    }
+
+    // Isara ang parehong file
+    carsData.close();
+    tempData.close();
+
+    // Palitan ang original na database file ng temporary file
+    remove("database.txt");
+    rename("tempdatabase.txt", "database.txt");
+
+    // I-pause ang system
+    system("pause");
+}
+
+
+void Car_Management::returnCar(const string& username) {
+    int cId, rentdays; // Variable to store the car ID and the number of days rented
+
+    // Open the existing car database file in read mode
+    ifstream carsData("database.txt");
+    // Open a temporary file to store updated car data
+    ofstream tempData("tempdatabase.txt");
+
+    // Check if the car database file is open
+    if (!carsData) {
+        cout << "File does not exist." << endl;
+        system("pause");
+        return;
+    }
+
+    // Prompt the user to enter the car ID they want to return
+    cout << "Enter car id you want to return: ";
+    cin >> cId;
+    // Prompt the user to enter the number of days the car was rented
+    cout << "How many days of rent: ";
+    cin >> rentdays;
+
+    bool carFound = false; // Flag to check if the car was found
+
+    // Variables to store car details
+    int carID, yearmodel;
+    string model, color;
+    float rentalRate;
+    bool available;
+
+    // Read car data from the original file
+    while(carsData >> carID >> model >> yearmodel >> color >> rentalRate >> available) {
+        // If the car is found and it is currently rented (not available)
+        if (carID == cId && !available) {
+            carFound = true; // Set the flag to true
+            available = true; // Mark the car as available
+            system("cls"); // Clear the console screen
+
+            // Display a message indicating that the car was returned successfully
+            cout << "Car returned successfully." << endl;
+            // Calculate the total rental fee
+            float total = rentalRate * rentdays;
+            
+            // Display the receipt
+            cout << "*-------------------------------*\n";
+            cout << "*                               *\n";
+            cout << "*           Receipt             *\n";
+            cout << "*                               *\n";
+            cout << "*-------------------------------*\n";
+            cout << "*                               *\n";
+            cout << "Customer : " << loggedInUser << endl;
+            cout << "Car ID: " << carID << endl;
+            cout << "Car Model: " << model << endl;
+            cout << "Year Model: " << yearmodel << endl;
+            cout << "Color: " << color << endl;
+            cout << "Rental Rate: Php" << rentalRate << " per day\n";
+            cout << "Number of days rented: " << rentdays << endl;
+            cout << "-------------------------------\n";
+            cout << "Total Rental Fee: Php" << total << endl;
+
+            // Write the updated car data to the temporary file
+            tempData << carID << " " << model << " " << yearmodel << " " << color << " " << rentalRate << " " << available << endl;
+        } else {
+            // If the car is not the one being returned, write the original data to the temporary file
+            tempData << carID << " " << model << " " << yearmodel << " " << color << " " << rentalRate << " " << available << endl;
+        }
+    }
+
+    // If the car was not found or it was already available
+    if (!carFound) {
+        cout << "Car not found or already available." << endl;
+    }
+
+    // Close both files
+    carsData.close();
+    tempData.close();
+
+    // Replace the original database file with the updated temporary file
+    remove("database.txt");
+    rename("tempdatabase.txt", "database.txt");
+
+    system("pause");
+}
+
+int main()
+{
+    Car_Management car;
+    car.frontPage();
+    return 0;
+}
