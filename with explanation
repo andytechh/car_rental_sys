@@ -260,7 +260,8 @@ void Car_Management::admin() {
         cout << "* [ 3 ]   Remove a Car          *\n";
         cout << "* [ 4 ]   View Cars             *\n";
         cout << "* [ 5 ]   View Rented Cars      *\n";
-        cout << "* [ 6 ]   Exit                  *\n";
+        cout << "* [ 6 ]   View Available        *\n";
+        cout << "* [ 7 ]   Exit                  *\n";
         cout << "*                               *\n";
         cout << "*-------------------------------*\n";
         cout << "* Select Options (1-5):         *\n";
@@ -284,6 +285,9 @@ void Car_Management::admin() {
                 viewRented(loggedInUser); 
                 break;
             case 6: 
+             	viewAvailable();
+             	break;
+            case 7: 
              	menu();
              	break;
             default:
